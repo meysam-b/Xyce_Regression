@@ -1,0 +1,52 @@
+* Testing AM noise using a vccs with 2nd order nonlinearity
+* Measring AM noise at fundamental frequency
+*
+* -------------------------------------------------------------------------------
+* f(x) = x^2
+* i = f( v + vn )
+* v = v0 + v1*cos(w*t)
+* vn = vn0 + vn1I*cos(w*t) - vn1Q*sin(w*t) + vn2I*cos(2*w*t) - vn2Q*sin(2*w*t)
+* -------------------------------------------------------------------------------
+* HB analytical results
+* i = v0^2 + 0.5*v1^2 + 2*v0*v1*cos(w*t) + 0.5*v1^2*cos(2*w*t)
+* -------------------------------------------------------------------------------
+* noise contributions analytical results:
+* i_n = 2 * vn * [ v0 + v1 * cos(w*t) ]
+* -------------------------------------------------------------------------------
+* TO BASEBAND OUTPUT:
+* i_n[0] = 2*vn0*v0 + vn1I*v1
+* AM NOISE: i_n[0]/i[0]
+* -------------------------------------------------------------------------------
+* TO 1ST HARMONIC:
+* i_n[1,AM] = 2*vn0*v1*cos(w*t) + 2*vn1I*v0*cos(w*t) + vn2I*v1*cos(w*t)
+* i_n[1,PM] = -2*vn1Q*v0*sin(w*t) - vn2Q*v1*sin(w*t)
+* AM NOISE: i_n[1]/i[1]
+* ------ Calculations -----------------------------------------------------------
+* v0 = 2m
+* v1 = 1m
+* R1 = 1k
+* i[0] = 4.5e-6
+* i[1] = 2*v0*v1 = 4e-6
+* vn (PSD) = 4*k*T*R1 = 1.656e-17 V^2/Hz
+
+
+VIN 1 0 2m SIN(2m 1m 1MEG -0.25u 0) ac 1 ;
+R1 1 2 1k ; add a resistor for noise
+E1 3 0 2 0 1 ; buffer with unity gain to avoud loading of NL device
+
+B1 3 4 I={(V(3)-V(4))*(V(3)-V(4))}
+ViB1 4 0 0 ; zero-volts source to sample the current
+H1 5 0 ViB1 1; voltage of node 4 is the current of B1
+
+.hb 1MEG
+.options hbint numfreq=2 tahb=0
+.print hb v(5) i(B1)
+
+.hbnoise V(5) 1 DEC 2 1 10
+.print hbnoise amnoise pmnoise dan(R1) dpn(R1)
+* .print hbnoise {sqrt(abs(amnoise))} {sqrt(abs(pmnoise))}
+
+* .noise V(5) VIN DEC 2 1 10
+* .print noise inoise onoise {sqrt(onoise)} DNO(*)
+* .DC R 1k 1k 1
+* .print dc I(VIN) V(1) V(2) V(5)
