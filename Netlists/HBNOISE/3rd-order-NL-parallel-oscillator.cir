@@ -1,0 +1,65 @@
+* Testing oscillator AM/PM noise
+* injection of noise to the tank is tricky. a noise source parallel to 
+* the inductance short circuits the baseband noise. 
+* So I add the noise directly to the NL element
+*
+* -------------------------------------------------------------------------------
+* f(x) = x^3
+* i = f( v + vn )
+* v = v0 + v1*cos(w*t)
+* vn = TBD
+* -------------------------------------------------------------------------------
+* HB analytical results
+* i = v0^2 + 0.5*v1^2 + 2*v0*v1*cos(w*t) + 0.5*v1^2*cos(2*w*t)
+* -------------------------------------------------------------------------------
+* noise contributions analytical results:
+* i_n = TBD
+* -------------------------------------------------------------------------------
+* NOISE AT FUNDAMENTAL
+* i_n[1,AM] = TBD
+* i_n[1,PM] = TBD
+* AM NOISE: i_n[1]/i[1]
+* ------ Calculations -----------------------------------------------------------
+* vn (PSD) = 4*k*T*R1 = 1.656e-17 V^2/Hz
+
+* ----------------------------
+* This test is not going to work until HB can provide an estimate of oscillation frequency
+
+.param pi = 3.1415926
+.param L = {4.869e-7/2/pi}
+.param C = {2e-12/2/pi}
+.param R = 20k
+.param G = {1/R}
+.param V1 = 1
+.param G3 = {-4*G/3/V1/V1}
+*.param G3 = -1e-3
+
+* tank
+R0 1 0 R ; this resistor does not generate baseband noise
+L0 1 0 L
+C0 1 0 C
+
+* NL element
+R1 1 2 1k ; add a resistor for noise
+E1 3 0 2 0 1 ; buffer with unity gain to avoid loading of NL device
+
+
+B1 1 0 I={G3*V(3)*V(3)*V(3)}
+* ViB1 4 0 0 ; zero-volts source to sample the current
+* H1 5 0 ViB1 1; voltage of node 4 is the current of B1
+
+.ic V(1)=0.8
+.hb 1.0e9
+.print hb V(1) I(B1)
+.options hbint numfreq= 20 hbosc=1 refnode= "V(1)"
+* .options linsol-hb prec_type=block_jacobi
+
+
+* .hbnoise V(1) 1 DEC 1 1e3 1e6
+* .print hbnoise amnoise pmnoise dan(R0) dpn(R0)
+* .print hbnoise {sqrt(abs(amnoise))} {sqrt(abs(pmnoise))}
+
+* .noise V(5) VIN DEC 2 1 10
+* .print noise inoise onoise {sqrt(onoise)} DNO(*)
+* .DC R 1k 1k 1
+* .print dc I(VIN) V(1) V(2) V(5)

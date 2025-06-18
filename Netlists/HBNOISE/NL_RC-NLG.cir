@@ -1,0 +1,29 @@
+* Testing AM/PM using nonlinear RC circuit
+* Measring anplitude/phase noise at fundamental frequency
+*
+* -------------------------------------------------------------------------------
+* f(x) = x^2
+* i = f( v + vn )
+* v = v1*cos(w*t)
+* ------ Calculations -----------------------------------------------------------
+
+.param R0 = 100
+.param C0 = 100f
+.param G2 = 2m
+
+VIN 1 0 2m SIN(0 1 10e9 0 0 90) ac 1 ;
+R1 2 1 R0 ; 
+B1 2 0 I={G2*V(2,0)*V(2,0)}
+C1 2 0 C0
+
+.hb 10e9
+.options hbint numfreq=10 tahb=0
+.options nonlin-hb abstol=1e-8
+.print hb {2*V(2)} {2*I(B1)}
+
+.hbnoise V(2) 1 DEC 2 1 10
+.print hbnoise amnoise pmnoise dan(R1) dpn(R1)
+* .print hbnoise {abs(amnoise)} pmnoise dan(R1) dpn(R1)
+
+* .noise V(2) VIN DEC 2 1 10
+* .print noise {abs(onoise)} inoise
