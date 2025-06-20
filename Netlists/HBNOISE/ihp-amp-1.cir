@@ -1,0 +1,38 @@
+* Testing AM/PM using ihp transistor
+.lib "./ihp/cornerHBT.lib" hbt_typ
+*
+* -------------------------------------------------------------------------------
+* f(x) = x^2
+* i = f( v + vn )
+* v = v1*cos(w*t)
+* ------ Calculations -----------------------------------------------------------
+
+.param VccVal = 2.5
+.param VbbVal = 1.0
+.param RcVal = 200
+.param ReVal = 10
+
+Vdc1 n_vcc 0 DC {VccVal}
+Vdc2 n_vbb 0 DC {VbbVal}
+Vrf n_vb n_vbb SIN(0 100m 10e9 0 0 90) ac 1 ;
+
+X1 n_vc n_vb n_ve 0 npn13G2
+
+Rc n_vcc n_vc {RcVal} ; 
+Re n_ve 0 {ReVal} ; 
+
+* .DC VbbVal 0 2 0.5
+* .print dc v(n_vc) 
+
+.hb 10e9
+.options hbint numfreq=10 tahb=2
+* .options linsol-hb type=belos 
+* .options nonlin-hb abstol=1e-8
+.print hb V(n_vc) I(Re)
+
+.hbnoise V(n_vc) 1 DEC 1 0.001 10
+.print hbnoise amnoise pmnoise dan(X1:Qnpn13G2)
+* .print hbnoise {abs(amnoise)} pmnoise dan(R1) dpn(R1)
+
+* .noise V(n_vc) Vrf DEC 2 1 10
+* .print noise onoise dno(X1:Qnpn13G2)
