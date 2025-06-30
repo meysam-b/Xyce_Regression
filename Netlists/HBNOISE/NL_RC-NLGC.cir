@@ -23,6 +23,6 @@ B1 2 0 I={G2*V(2,0)*V(2,0)}
 .print hb {2*V(2)}
  
 .hbnoise V(2) 1 DEC 2 1 10
-.print hbnoise amnoise pmnoise dan(R1) dpn(R1)
+.print hbnoise amnoise pmnoise {10*log(amnoise)} {10*log(pmnoise)} {10*log(dan(R1))} dpn(R1)
 
 * .print hbnoise {abs(amnoise)} pmnoise dan(R1) dpn(R1)

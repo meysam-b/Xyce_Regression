@@ -1,5 +1,5 @@
 * Testing AM/PM using ihp transistor
-.lib "./ihp/cornerHBT.lib" hbt_typ
+.lib "./ihp_sg13g2/cornerHBT.lib" hbt_typ
 *
 * -------------------------------------------------------------------------------
 * f(x) = x^2
@@ -31,7 +31,7 @@ Re n_ve 0 {ReVal} ;
 .print hb V(n_vc) I(Re)
 
 .hbnoise V(n_vc) 1 DEC 1 0.001 10
-.print hbnoise amnoise pmnoise dan(X1:Qnpn13G2)
+.print hbnoise amnoise pmnoise {10*log(amnoise)} {10*log(pmnoise)} {10*log(dan(X1:Qnpn13G2))} dan(X1:Qnpn13G2)
 * .print hbnoise {abs(amnoise)} pmnoise dan(R1) dpn(R1)
 
 * .noise V(n_vc) Vrf DEC 2 1 10
