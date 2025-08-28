@@ -1,0 +1,30 @@
+* Testing AM/PM using ihp transistor
+.lib "./ihp_sg13g2/cornerHBT.lib" hbt_typ
+.lib "./ihp_sg13g2/cornerRES.lib" res_typ
+.lib "./ihp_sg13g2/cornerCAP.lib" cap_typ
+*
+* -------------------------------------------------------------------------------
+* f(x) = x^2
+* i = f( v + vn )
+* v = v1*cos(w*t)
+* ------ Calculations -----------------------------------------------------------
+
+.param VccVal = 2.5
+.param VbbVal = 1.0
+.param RcVal = 200
+.param ReVal = 10
+
+Vdc1 n_vcc 0 DC {VccVal}
+Vdc2 n_vbb 0 DC {VbbVal}
+Vrf n_vb n_vbb SIN(0 100m 10e9 0 0 90) ac 1 ;
+
+X1 n_vc n_vb n_ve 0 npn13G2
+
+*Rc n_vcc n_vc {RcVal} ; 
+XRc n_vcc n_vc rsil w=0.5u l=0.5u
+XCc n_vcc n_vc cap_cmim w=10u l=10u
+Re n_ve 0 {ReVal} ; 
+
+.DC VbbVal 0 2 0.5
+.print dc v(n_vc) 
+
